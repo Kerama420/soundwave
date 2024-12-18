@@ -70,33 +70,41 @@ function showTrackDetails(track) {
     <h4>${track.name}</h4>
     <p>Artist: ${track.artists.map(artist => artist.name).join(', ')}</p>
     <img src="${track.album.images[0]?.url || 'default-image.jpg'}" alt="${track.name}" style="width:100px;height:100px;">
-    <button onclick="addToFavorites('${track.name}')">Add to Favorites</button>
-    <button onclick="addToPlaylist('${track.name}')">Add to Playlist</button>
+    <button onclick="addToFavorites('${track.name}', '${track.album.images[0]?.url || 'default-image.jpg'}')">Add to Favorites</button>
+    <button onclick="addToPlaylist('${track.name}', '${track.album.images[0]?.url || 'default-image.jpg'}')">Add to Playlist</button>
   `;
 }
 
 // Add to Favorites
 const favorites = [];
-function addToFavorites(trackName) {
-  favorites.push(trackName);
+function addToFavorites(trackName, imageUrl) {
+  favorites.push({ name: trackName, image: imageUrl });
   updateFavorites();
 }
 
 // Update Favorites
 function updateFavorites() {
   const favoritesDiv = document.getElementById('favorites');
-  favoritesDiv.innerHTML = favorites.map(track => `<div>${track}</div>`).join('');
+  favoritesDiv.innerHTML = favorites
+    .map(
+      track => `
+      <div class="d-flex align-items-center mb-2">
+        <img src="${track.image}" alt="${track.name}" style="width:50px;height:50px;margin-right:10px;">
+        <span>${track.name}</span>
+      </div>`
+    )
+    .join('');
 }
 
 // Add to Playlist
 const customPlaylists = {};
-function addToPlaylist(trackName) {
+function addToPlaylist(trackName, imageUrl) {
   const playlistName = prompt('Enter playlist name:');
   if (playlistName) {
     if (!customPlaylists[playlistName]) {
       customPlaylists[playlistName] = [];
     }
-    customPlaylists[playlistName].push(trackName);
+    customPlaylists[playlistName].push({ name: trackName, image: imageUrl });
     updatePlaylists();
   }
 }
@@ -108,7 +116,13 @@ function updatePlaylists() {
     .map(
       playlist =>
         `<h4>${playlist}</h4><ul>${customPlaylists[playlist]
-          .map(track => `<li>${track}</li>`)
+          .map(
+            track => `
+            <li class="d-flex align-items-center mb-2">
+              <img src="${track.image}" alt="${track.name}" style="width:50px;height:50px;margin-right:10px;">
+              <span>${track.name}</span>
+            </li>`
+          )
           .join('')}</ul>`
     )
     .join('');

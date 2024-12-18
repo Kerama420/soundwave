@@ -24,3 +24,9 @@ body {
     margin-top: 10px;
   }
   
+  #favorites img,
+  #custom_playlists img {
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  
