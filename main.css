@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .list-group-item {
+    cursor: pointer;
+  }
+  
+  .list-group-item img {
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  
+  .btn-primary {
+    background-color: #1db954;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1ed760;
+  }
+  
+  #track_details img {
+    margin-top: 10px;
+  }
+  
