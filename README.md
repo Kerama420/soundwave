@@ -39,13 +39,3 @@ SoundWave is a web-based music application that allows users to search for track
 - **Spotify Web API**: For fetching song data.
 
 ---
-
-## **Setup Instructions**
-
-Follow these steps to run the project locally:
-
-### 1. **Clone the Repository**
-```bash
-git clone <repository-url>
-cd SoundWave
-
