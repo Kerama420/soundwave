@@ -1,6 +1,6 @@
 // Spotify API Configuration
-const clientId = '43b591551e6242169e1eb09919c034f2'; // Replace with your Spotify Client ID
-const clientSecret = '375ea26c73c64f889e17fb5cffee086b'; // Replace with your Spotify Client Secret
+const clientId = '43b591551e6242169e1eb09919c034f2'; 
+const clientSecret = '375ea26c73c64f889e17fb5cffee086b'; 
 
 // Fetch Access Token
 async function getAccessToken() {
