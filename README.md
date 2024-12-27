@@ -38,4 +38,17 @@ SoundWave is a web-based music application that allows users to search for track
 ### Backend
 - **Spotify Web API**: For fetching song data.
 
+### **Accessing the site**
+Here is the link https://kerama420.github.io/soundwave/
+
+**Accessing site on VsCode**
+1. Fork and clone the repository.
+2. Create a Spotify Developer Account.
+3. Create a new application to get your Client ID and Client Secret.
+4. Open the file on vs code 
+5. Replace the placeholders in app.js with your credentials
+6. Open the live server.
+
+
 ---
+
