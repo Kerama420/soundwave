@@ -1,8 +1,10 @@
-// Spotify API Configuration
 const clientId = '43b591551e6242169e1eb09919c034f2'; 
 const clientSecret = '375ea26c73c64f889e17fb5cffee086b'; 
 
-// Fetch Access Token
+const favorites = new Set();
+const playlists = {};
+
+// Get Spotify Access Token
 async function getAccessToken() {
   const tokenUrl = 'https://accounts.spotify.com/api/token';
   const credentials = btoa(`${clientId}:${clientSecret}`);
@@ -26,9 +28,7 @@ async function searchTracks(query) {
   const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
 
   const response = await fetch(searchUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   const data = await response.json();
@@ -42,22 +42,11 @@ function displayTracks(tracks) {
 
   tracks.forEach(track => {
     const listItem = document.createElement('div');
-    listItem.className = 'list-group-item d-flex align-items-center';
-
-    const img = document.createElement('img');
-    img.src = track.album.images[0]?.url || 'default-image.jpg';
-    img.alt = track.name;
-    img.style.width = '50px';
-    img.style.height = '50px';
-    img.style.marginRight = '10px';
-
-    const trackName = document.createElement('span');
-    trackName.textContent = `${track.name} by ${track.artists[0].name}`;
-    trackName.style.flexGrow = '1';
-
-    listItem.appendChild(img);
-    listItem.appendChild(trackName);
-
+    listItem.className = 'list-group-item';
+    listItem.innerHTML = `
+      <img src="${track.album.images[2].url}" alt="Album Cover" width="50" height="50">
+      ${track.name} by ${track.artists[0].name}
+    `;
     listItem.addEventListener('click', () => showTrackDetails(track));
     trackList.appendChild(listItem);
   });
@@ -69,66 +58,53 @@ function showTrackDetails(track) {
   detailsDiv.innerHTML = `
     <h4>${track.name}</h4>
     <p>Artist: ${track.artists.map(artist => artist.name).join(', ')}</p>
-    <img src="${track.album.images[0]?.url || 'default-image.jpg'}" alt="${track.name}" style="width:100px;height:100px;">
-    <button onclick="addToFavorites('${track.name}', '${track.album.images[0]?.url || 'default-image.jpg'}')">Add to Favorites</button>
-    <button onclick="addToPlaylist('${track.name}', '${track.album.images[0]?.url || 'default-image.jpg'}')">Add to Playlist</button>
+    <img src="${track.album.images[1].url}" alt="Album Cover" width="150">
+    <button class="btn btn-success mt-3" onclick="addToFavorites('${track.id}', '${track.name}')">Add to Favorites</button>
+    <button class="btn btn-secondary mt-3" onclick="addToPlaylist('${track.id}', '${track.name}')">Add to Playlist</button>
   `;
 }
 
 // Add to Favorites
-const favorites = [];
-function addToFavorites(trackName, imageUrl) {
-  favorites.push({ name: trackName, image: imageUrl });
-  updateFavorites();
-}
+function addToFavorites(trackId, trackName) {
+  if (favorites.has(trackId)) {
+    alert('This track is already in Favorites!');
+    return;
+  }
 
-// Update Favorites
-function updateFavorites() {
+  favorites.add(trackId);
   const favoritesDiv = document.getElementById('favorites');
-  favoritesDiv.innerHTML = favorites
-    .map(
-      track => `
-      <div class="d-flex align-items-center mb-2">
-        <img src="${track.image}" alt="${track.name}" style="width:50px;height:50px;margin-right:10px;">
-        <span>${track.name}</span>
-      </div>`
-    )
-    .join('');
+  const listItem = document.createElement('div');
+  listItem.className = 'list-group-item';
+  listItem.textContent = trackName;
+  favoritesDiv.appendChild(listItem);
 }
 
 // Add to Playlist
-const customPlaylists = {};
-function addToPlaylist(trackName, imageUrl) {
+function addToPlaylist(trackId, trackName) {
   const playlistName = prompt('Enter playlist name:');
-  if (playlistName) {
-    if (!customPlaylists[playlistName]) {
-      customPlaylists[playlistName] = [];
-    }
-    customPlaylists[playlistName].push({ name: trackName, image: imageUrl });
-    updatePlaylists();
+  if (!playlistName) return;
+
+  if (!playlists[playlistName]) {
+    playlists[playlistName] = new Set();
+    const customPlaylistsDiv = document.getElementById('custom_playlists');
+    const playlistDiv = document.createElement('div');
+    playlistDiv.id = `playlist-${playlistName}`;
+    playlistDiv.innerHTML = `<h5>${playlistName}</h5><ul class="list-group"></ul>`;
+    customPlaylistsDiv.appendChild(playlistDiv);
+  } else if (playlists[playlistName].has(trackId)) {
+    alert('This track is already in this playlist!');
+    return;
   }
+
+  playlists[playlistName].add(trackId);
+  const playlistUl = document.querySelector(`#playlist-${playlistName} ul`);
+  const listItem = document.createElement('li');
+  listItem.className = 'list-group-item';
+  listItem.textContent = trackName;
+  playlistUl.appendChild(listItem);
 }
 
-// Update Playlists
-function updatePlaylists() {
-  const playlistsDiv = document.getElementById('custom_playlists');
-  playlistsDiv.innerHTML = Object.keys(customPlaylists)
-    .map(
-      playlist =>
-        `<h4>${playlist}</h4><ul>${customPlaylists[playlist]
-          .map(
-            track => `
-            <li class="d-flex align-items-center mb-2">
-              <img src="${track.image}" alt="${track.name}" style="width:50px;height:50px;margin-right:10px;">
-              <span>${track.name}</span>
-            </li>`
-          )
-          .join('')}</ul>`
-    )
-    .join('');
-}
-
-// Attach Event Listeners
+// Event Listeners
 document.getElementById('search_button').addEventListener('click', () => {
   const query = document.getElementById('search_input').value;
   if (query) searchTracks(query);
